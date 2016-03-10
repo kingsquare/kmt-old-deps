@@ -1,0 +1,21 @@
+{
+  "name": "kingsquare/kmt-old-deps",
+  "description": "Old non-composer deps for KMT. Basically just a bag of old code from various places",
+  "minimum-stability": "stable",
+  "license": "proprietary",
+  "autoload": {
+    "classmap": [
+      "pdf/",
+      "PEAR",
+      "php_modules",
+      "phpThumb",
+      "tcpdf",
+      "twitter",
+      "swiftmailer",
+      "recaptcha"
+    ]
+  },
+  "include-path": [
+    "PEAR/"
+  ]
+}
