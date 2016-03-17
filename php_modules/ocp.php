@@ -194,7 +194,7 @@ namespace OCP {
 								'memory_consumption' => $info['memory_consumption'],
 								'last_used' => $info['last_used'],
 								'last_used_timestamp' => $info['last_used_timestamp'],
-								'timestamp' => $info['timestamp'],
+								'timestamp' => !empty($info['timestamp']) ? $info['timestamp']: null,
 								'directory' => true,
 								'children' => array(),
 						);
@@ -206,7 +206,7 @@ namespace OCP {
 							$resultPos[$dir]['last_used'] = $info['last_used'];
 						}
 						if (empty($resultPos[$dir]['timestamp']) || !empty($info['timestamp']) && $resultPos[$dir]['timestamp'] > $info['timestamp']) {
-							$resultPos[$dir]['timestamp'] = $info['timestamp'];
+							$resultPos[$dir]['timestamp'] = !empty($info['timestamp']) ? $info['timestamp']: null;
 						}
 					}
 
