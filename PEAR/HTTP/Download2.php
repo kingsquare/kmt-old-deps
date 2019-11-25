@@ -438,7 +438,7 @@ class HTTP_Download2
         {
         case 'private':
         case 'public':
-            $this->headers['Cache-Control'] 
+            $this->headers['Cache-Control']
                 = $cache . ', must-revalidate, max-age='. abs($maxage);
             return true;
             break;
@@ -672,7 +672,7 @@ class HTTP_Download2
             @set_time_limit(0);
         }
 
-        if ($autoSetContentDisposition 
+        if ($autoSetContentDisposition
             && !isset($this->headers['Content-Disposition'])
         ) {
             $this->setContentDisposition();
@@ -1017,18 +1017,17 @@ class HTTP_Download2
      */
     function sortChunks(&$chunks)
     {
-        $sortFunc = create_function(
-            '$a,$b',
-            'if ($a[0] == $b[0]) {
+        $sortFunc = static function ($a, $b) {
+            if ($a[0] == $b[0]) {
                 if ($a[1] == $b[1]) {
                     return 0;
                 }
                 return (($a[1] != "*" && $a[1] < $b[1])
-                        || $b[1] == "*") ? -1 : 1;
-             }
+                    || $b[1] == "*") ? -1 : 1;
+            }
 
-             return ($a[0] < $b[0]) ? -1 : 1;'
-        );
+            return ($a[0] < $b[0]) ? -1 : 1;
+        };
 
         usort($chunks, $sortFunc);
     }
@@ -1117,14 +1116,14 @@ class HTTP_Download2
     function isCached()
     {
         return (
-            (isset($_SERVER['HTTP_IF_MODIFIED_SINCE']) 
+            (isset($_SERVER['HTTP_IF_MODIFIED_SINCE'])
             && $this->lastModified == strtotime(
                 current(
                     $a = explode(';', $_SERVER['HTTP_IF_MODIFIED_SINCE'])
                 )
-            )) 
+            ))
             ||
-            (isset($_SERVER['HTTP_IF_NONE_MATCH']) 
+            (isset($_SERVER['HTTP_IF_NONE_MATCH'])
             && $this->compareAsterisk('HTTP_IF_NONE_MATCH', $this->etag))
         );
     }
@@ -1137,14 +1136,14 @@ class HTTP_Download2
      */
     function isValidRange()
     {
-        if (isset($_SERVER['HTTP_IF_MATCH']) 
+        if (isset($_SERVER['HTTP_IF_MATCH'])
             && !$this->compareAsterisk('HTTP_IF_MATCH', $this->etag)
         ) {
             return false;
         }
 
-        if (isset($_SERVER['HTTP_IF_RANGE']) 
-            && $_SERVER['HTTP_IF_RANGE'] !== $this->etag 
+        if (isset($_SERVER['HTTP_IF_RANGE'])
+            && $_SERVER['HTTP_IF_RANGE'] !== $this->etag
             &&  strtotime($_SERVER['HTTP_IF_RANGE']) !== $this->lastModified
         ) {
             return false;
