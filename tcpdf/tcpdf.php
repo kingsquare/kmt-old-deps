@@ -20638,9 +20638,11 @@ Putting 1 is equivalent to putting 0 and calling Ln() just after. Default value:
 											}
 											// justify block
 											$pmid = preg_replace_callback('/([0-9\.\+\-]*)[\s]('.$strpiece[1][0].')[\s]('.$strpiece[2][0].')([\s]*)/x',
-												create_function('$matches', 'global $spacew;
-												$newx = sprintf("%.2F",(floatval($matches[1]) + $spacew));
-												return "".$newx." ".$matches[2]." x*#!#*x".$matches[3].$matches[4];'), $pmid, 1);
+												static function($matches) {
+                                                    global $spacew;
+                                                    $newx = sprintf('%.2F', (float)$matches[1] + $spacew);
+                                                    return $newx. ' ' .$matches[2]. ' x*#!#*x' .$matches[3].$matches[4];
+												}, $pmid, 1);
 											break;
 										}
 										case 're': {
@@ -20680,10 +20682,12 @@ Putting 1 is equivalent to putting 0 and calling Ln() just after. Default value:
 												}
 											}
 											$pmid = preg_replace_callback('/('.$xmatches[1].')[\s]('.$xmatches[2].')[\s]('.$xmatches[3].')[\s]('.$strpiece[1][0].')[\s](re)([\s]*)/x',
-												create_function('$matches', 'global $x_diff, $w_diff;
-												$newx = sprintf("%.2F",(floatval($matches[1]) + $x_diff));
-												$neww = sprintf("%.2F",(floatval($matches[3]) + $w_diff));
-												return "".$newx." ".$matches[2]." ".$neww." ".$matches[4]." x*#!#*x".$matches[5].$matches[6];'), $pmid, 1);
+												static function ($matches){
+                                                    global $x_diff, $w_diff;
+                                                    $newx = sprintf('%.2F', (float)$matches[1] + $x_diff);
+                                                    $neww = sprintf('%.2F', (float)$matches[3] + $w_diff);
+                                                    return $newx. ' ' .$matches[2]. ' ' .$neww. ' ' .$matches[4]. ' x*#!#*x' .$matches[5].$matches[6];
+												}, $pmid, 1);
 											break;
 										}
 										case 'c': {
@@ -20692,11 +20696,13 @@ Putting 1 is equivalent to putting 0 and calling Ln() just after. Default value:
 											$currentxpos = $xmatches[1];
 											// justify block
 											$pmid = preg_replace_callback('/('.$xmatches[1].')[\s]('.$xmatches[2].')[\s]('.$xmatches[3].')[\s]('.$xmatches[4].')[\s]('.$xmatches[5].')[\s]('.$strpiece[1][0].')[\s](c)([\s]*)/x',
-												create_function('$matches', 'global $spacew;
-												$newx1 = sprintf("%.3F",(floatval($matches[1]) + $spacew));
-												$newx2 = sprintf("%.3F",(floatval($matches[3]) + $spacew));
-												$newx3 = sprintf("%.3F",(floatval($matches[5]) + $spacew));
-												return "".$newx1." ".$matches[2]." ".$newx2." ".$matches[4]." ".$newx3." ".$matches[6]." x*#!#*x".$matches[7].$matches[8];'), $pmid, 1);
+												static function($matches){
+											    global $spacew;
+												$newx1 = sprintf('%.3F', (float)$matches[1] + $spacew);
+												$newx2 = sprintf('%.3F', (float)$matches[3] + $spacew);
+												$newx3 = sprintf('%.3F', (float)$matches[5] + $spacew);
+												return $newx1. ' ' .$matches[2]. ' ' .$newx2. ' ' .$matches[4]. ' ' .$newx3. ' ' .$matches[6]. ' x*#!#*x' .$matches[7].$matches[8];
+												}, $pmid, 1);
 											break;
 										}
 									}
@@ -20744,10 +20750,12 @@ Putting 1 is equivalent to putting 0 and calling Ln() just after. Default value:
 									$pmidtemp = preg_replace('/[\\\][\(]/x', '\\#!#OP#!#', $pmidtemp);
 									$pmidtemp = preg_replace('/[\\\][\)]/x', '\\#!#CP#!#', $pmidtemp);
 									$pmid = preg_replace_callback("/\[\(([^\)]*)\)\]/x",
-												create_function('$matches', 'global $spacew;
-												$matches[1] = str_replace("#!#OP#!#", "(", $matches[1]);
-												$matches[1] = str_replace("#!#CP#!#", ")", $matches[1]);
-												return "[(".str_replace(chr(0).chr(32), ") ".sprintf("%.3F", $spacew)." (", $matches[1]).")]";'), $pmidtemp);
+                                    static function($matches){
+									    global $spacew;
+                                        $matches[1] = str_replace('#!#OP#!#', '(', $matches[1]);
+                                        $matches[1] = str_replace('#!#CP#!#', ')', $matches[1]);
+                                        return '[(' .str_replace(chr(0).chr(32), ') ' .sprintf('%.3F', $spacew). ' (', $matches[1]). ')]';
+                                    }, $pmidtemp);
 									if ($this->inxobj) {
 										// we are inside an XObject template
 										$this->xobjects[$this->xobjid]['outdata'] = $pstart."\n".$pmid."\n".$pend;
@@ -23912,8 +23920,9 @@ Putting 1 is equivalent to putting 0 and calling Ln() just after. Default value:
 		$jfrompage = $frompage;
 		$jtopage = $topage;
 		$this->javascript = preg_replace_callback('/this\.addField\(\'([^\']*)\',\'([^\']*)\',([0-9]+)/',
-			create_function('$matches', 'global $jfrompage, $jtopage;
-			$pagenum = intval($matches[3]) + 1;
+			static function($matches){
+		    global $jfrompage, $jtopage;
+			$pagenum = (int)$matches[3] + 1;
 			if (($pagenum >= $jtopage) AND ($pagenum < $jfrompage)) {
 				$newpage = ($pagenum + 1);
 			} elseif ($pagenum == $jfrompage) {
@@ -23922,7 +23931,7 @@ Putting 1 is equivalent to putting 0 and calling Ln() just after. Default value:
 				$newpage = $pagenum;
 			}
 			--$newpage;
-			return "this.addField(\'".$matches[1]."\',\'".$matches[2]."\',".$newpage."";'), $tmpjavascript);
+			return "this.addField(\'".$matches[1]."\',\'".$matches[2]."\',".$newpage;}, $tmpjavascript);
 		// return to last page
 		$this->lastPage(true);
 		return true;
@@ -24079,8 +24088,9 @@ Putting 1 is equivalent to putting 0 and calling Ln() just after. Default value:
 		global $jpage;
 		$jpage = $page;
 		$this->javascript = preg_replace_callback('/this\.addField\(\'([^\']*)\',\'([^\']*)\',([0-9]+)/',
-			create_function('$matches', 'global $jpage;
-			$pagenum = intval($matches[3]) + 1;
+			static function($matches){
+		    global $jpage;
+			$pagenum = (int)$matches[3] + 1;
 			if ($pagenum >= $jpage) {
 				$newpage = ($pagenum - 1);
 			} elseif ($pagenum == $jpage) {
@@ -24089,7 +24099,7 @@ Putting 1 is equivalent to putting 0 and calling Ln() just after. Default value:
 				$newpage = $pagenum;
 			}
 			--$newpage;
-			return "this.addField(\'".$matches[1]."\',\'".$matches[2]."\',".$newpage."";'), $tmpjavascript);
+			return "this.addField(\'".$matches[1]."\',\'".$matches[2]."\',".$newpage;}, $tmpjavascript);
 		// return to last page
 		$this->lastPage(true);
 		return true;
