@@ -346,7 +346,7 @@ class phpthumb_bmp {
 		if ($ExtractPalette || $ExtractData) {
 			$PaletteEntries = 0;
 			if ($thisfile_bmp_header_raw['bits_per_pixel'] < 16) {
-				$PaletteEntries = 2 ** $thisfile_bmp_header_raw['bits_per_pixel'];
+				$PaletteEntries = pow(2,$thisfile_bmp_header_raw['bits_per_pixel']);
 			} elseif (isset($thisfile_bmp_header_raw['colors_used']) && ($thisfile_bmp_header_raw['colors_used'] > 0) && ($thisfile_bmp_header_raw['colors_used'] <= 256)) {
 				$PaletteEntries = $thisfile_bmp_header_raw['colors_used'];
 			}
@@ -807,7 +807,7 @@ class phpthumb_bmp {
 		$byteword = strrev($byteword);
 		$bytewordlen = strlen($byteword);
 		for ($i = 0; $i < $bytewordlen; $i++) {
-			$intvalue += ord($byteword{$i}) * (256 ** ($bytewordlen - 1 - $i));
+			$intvalue += ord($byteword{$i}) * pow(256, ($bytewordlen - 1 - $i));
 		}
 		return $intvalue;
 	}
@@ -840,7 +840,7 @@ class phpthumb_bmp {
 		}
 		$decvalue = 0;
 		for ($i = 0, $iMax = strlen($binstring); $i < $iMax; $i++) {
-			$decvalue += ((int) substr($binstring, strlen($binstring) - $i - 1, 1)) * (2 ** $i);
+			$decvalue += ((int) substr($binstring, strlen($binstring) - $i - 1, 1)) * pow(2, $i);
 		}
 		return $this->CastAsInt($decvalue * $signmult);
 	}

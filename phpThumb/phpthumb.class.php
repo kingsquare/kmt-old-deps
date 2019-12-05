@@ -285,10 +285,10 @@ class phpthumb {
 		} elseif (@is_array($this->$param)) {
 			if (is_array($value)) {
 				foreach ($value as $arraykey => $arrayvalue) {
-					$this->$param[] = $arrayvalue;
+					$this->{$param}[] = $arrayvalue;
 				}
 			} else {
-				$this->$param[] = $value;
+				$this->{$param}[] = $value;
 			}
 		} else {
 			$this->$param = $value;
