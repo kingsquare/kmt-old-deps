@@ -20,5 +20,11 @@
   },
   "include-path": [
     "PEAR/"
-  ]
+  ],
+  "require": {
+    "ext-gd": "*",
+    "ext-exif": "*",
+    "ext-curl": "*",
+    "ext-zlib": "*"
+  }
 }

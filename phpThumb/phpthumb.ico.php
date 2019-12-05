@@ -11,12 +11,8 @@
 
 class phpthumb_ico {
 
-	function phpthumb_ico() {
-		return true;
-	}
-
-
 	function GD2ICOstring(&$gd_image_array) {
+	    $icANDmask = [];
 		foreach ($gd_image_array as $key => $gd_image) {
 
 			$ImageWidths[$key]  = ImageSX($gd_image);
@@ -52,7 +48,7 @@ class phpthumb_ico {
 			}
 			$icAND[$key] = '';
 			foreach ($icANDmask[$key] as $y => $scanlinemaskbits) {
-				for ($i = 0; $i < strlen($scanlinemaskbits); $i += 8) {
+				for ($i = 0, $iMax = strlen($scanlinemaskbits); $i < $iMax; $i += 8) {
 					$icAND[$key] .= chr(bindec(str_pad(substr($scanlinemaskbits, $i, 8), 8, '0', STR_PAD_LEFT)));
 				}
 			}
@@ -115,5 +111,3 @@ class phpthumb_ico {
 	}
 
 }
-
-?>

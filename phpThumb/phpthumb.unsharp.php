@@ -147,4 +147,3 @@ class phpUnsharpMask {
 		return true;
 	}
 }
-?>
