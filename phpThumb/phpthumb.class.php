@@ -280,20 +280,24 @@ class phpthumb {
 
 	// public:
 	function setParameter($param, $value) {
-		if ($param === 'src') {
-			$this->setSourceFilename($this->ResolveFilenameToAbsolute($value));
-		} elseif (@is_array($this->$param)) {
-			if (is_array($value)) {
-				foreach ($value as $arraykey => $arrayvalue) {
-					$this->{$param}[] = $arrayvalue;
-				}
-			} else {
-				$this->{$param}[] = $value;
-			}
-		} else {
-			$this->$param = $value;
-		}
-		return true;
+        if ($param === 'src') {
+            $this->setSourceFilename($this->ResolveFilenameToAbsolute($value));
+            return true;
+        }
+
+        if (isset($this->$param) && is_array($this->$param)) {
+            if (is_array($value)) {
+                foreach ($value as $arraykey => $arrayvalue) {
+                    $this->{$param}[] = $arrayvalue;
+                }
+            } else {
+                $this->{$param}[] = $value;
+            }
+            return true;
+        }
+
+        $this->$param = $value;
+        return true;
 	}
 
 	// public:
