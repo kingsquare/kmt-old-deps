@@ -16,9 +16,9 @@
  */
 
 ob_start();
-if (!file_exists(dirname(__FILE__).'/phpthumb.functions.php') || !include_once(dirname(__FILE__) . '/phpthumb.functions.php')) {
+if (!file_exists(__DIR__ .'/phpthumb.functions.php') || !include_once(__DIR__ . '/phpthumb.functions.php')) {
 	ob_end_flush();
-	die('failed to include_once(phpthumb.functions.php) - realpath="'.realpath(dirname(__FILE__).'/phpthumb.functions.php').'"');
+	die('failed to include_once(phpthumb.functions.php) - realpath="'.realpath(__DIR__ .'/phpthumb.functions.php').'"');
 }
 ob_end_clean();
 
@@ -67,7 +67,7 @@ $PHPTHUMB_CONFIG['cache_maxfiles'] = null;             // delete least-recently-
 
 // * Source image cache configuration
 $PHPTHUMB_CONFIG['cache_source_enabled']   = false;                               // if true, source images obtained via HTTP are cached to $PHPTHUMB_CONFIG['cache_source_directory']
-$PHPTHUMB_CONFIG['cache_source_directory'] = dirname(__FILE__).'/cache/source/';  // set the cache directory for unprocessed source images
+$PHPTHUMB_CONFIG['cache_source_directory'] = __DIR__ .'/cache/source/';  // set the cache directory for unprocessed source images
 
 // * cache source modification date configuration
 $PHPTHUMB_CONFIG['cache_source_filemtime_ignore_local']  = true; // if true, local source images will not be checked for modification date and cached image will be used if available, even if source image is changed or removed
@@ -110,12 +110,12 @@ $PHPTHUMB_CONFIG['temp_directory'] = $PHPTHUMB_CONFIG['cache_directory'];  // se
 // you can process with your memory limitation (e.g. 1600 * 1200 = 1920000)
 // As a general guideline, this number will be about 20% of your PHP memory
 // configuration, so 8M = 1,677,722; 16M = 3,355,443; 32M = 6,710,886; etc.
-if (phpthumb_functions::version_compare_replacement(phpversion(), '4.3.2', '>=') && !defined('memory_get_usage') && !@ini_get('memory_limit')) {
+if (PHP_VERSION_ID >= 40302 && !defined('memory_get_usage') && !@ini_get('memory_limit')) {
 	// memory_get_usage() will only be defined if your PHP is compiled with the --enable-memory-limit configuration option.
 	$PHPTHUMB_CONFIG['max_source_pixels'] = 0;         // no memory limit
 } else {
 	// calculate default max_source_pixels as 1/6 of memory limit configuration
-	$PHPTHUMB_CONFIG['max_source_pixels'] = round(max(intval(ini_get('memory_limit')), intval(get_cfg_var('memory_limit'))) * 1048576 / 6);
+	$PHPTHUMB_CONFIG['max_source_pixels'] = round(max((int)ini_get('memory_limit'), (int)get_cfg_var('memory_limit')) * 1048576 / 6);
 	//$PHPTHUMB_CONFIG['max_source_pixels'] = 0;       // no memory limit
 	//$PHPTHUMB_CONFIG['max_source_pixels'] = 1920000; // allow 1600x1200 images (2Mpx), no larger (about 12MB memory required)
 	//$PHPTHUMB_CONFIG['max_source_pixels'] = 2795000; // 16MB memory limit
@@ -126,7 +126,7 @@ if (phpthumb_functions::version_compare_replacement(phpversion(), '4.3.2', '>=')
 // ImageMagick configuration
 $PHPTHUMB_CONFIG['prefer_imagemagick']        = true;  // If true, use ImageMagick to resize thumbnails if possible, since it is usually faster than GD functions; if false only use ImageMagick if PHP memory limit is too low.
 $PHPTHUMB_CONFIG['imagemagick_use_thumbnail'] = true;  // If true, use ImageMagick's "-thumbnail" resizing parameter (if available) which removes extra non-image metadata (profiles, EXIF info, etc) resulting in much smaller filesize; if false, use "-resize" paramter which retains this info
-if (strtoupper(substr(PHP_OS, 0, 3)) == 'WIN') {
+if (stripos(PHP_OS, 'WIN') === 0) {
 	// Windows: set absolute pathname
 	$PHPTHUMB_CONFIG['imagemagick_path'] = 'C:/Program Files/ImageMagick-6.6.5-Q16/convert.exe';
 } else {
@@ -174,7 +174,7 @@ $PHPTHUMB_CONFIG['border_hexcolor']     = '000000'; // Default border color - us
 $PHPTHUMB_CONFIG['background_hexcolor'] = 'FFFFFF'; // Default background color when thumbnail aspect ratio does not match fixed-dimension box - usual HTML-style hex color notation (overridden with 'bg' parameter)
 
 // * Watermark configuration
-$PHPTHUMB_CONFIG['ttf_directory'] = dirname(__FILE__).'/fonts'; // Base directory for TTF font files
+$PHPTHUMB_CONFIG['ttf_directory'] = __DIR__ .'/fonts'; // Base directory for TTF font files
 //$PHPTHUMB_CONFIG['ttf_directory'] = 'c:/windows/fonts';
 
 
@@ -248,7 +248,7 @@ $PHPTHUMB_DEFAULTS_DISABLEGETPARAMS  = false; // if true, GETstring parameters w
 
 function phpThumbURL($ParameterString) {
 	global $PHPTHUMB_CONFIG;
-	return str_replace(@$PHPTHUMB_CONFIG['document_root'], '', dirname(__FILE__)).DIRECTORY_SEPARATOR.'phpThumb.php?'.$ParameterString.'&hash='.md5($ParameterString.@$PHPTHUMB_CONFIG['high_security_password']);
+	return str_replace(@$PHPTHUMB_CONFIG['document_root'], '', __DIR__).DIRECTORY_SEPARATOR.'phpThumb.php?'.$ParameterString.'&hash='.md5($ParameterString.@$PHPTHUMB_CONFIG['high_security_password']);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

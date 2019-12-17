@@ -20,15 +20,10 @@
 
 class phpthumb_bmp {
 
-	function phpthumb_bmp() {
-		return true;
-	}
-
 	function phpthumb_bmp2gd(&$BMPdata, $truecolor=true) {
 		$ThisFileInfo = array();
 		if ($this->getid3_bmp($BMPdata, $ThisFileInfo, true, true)) {
-			$gd = $this->PlotPixelsGD($ThisFileInfo['bmp'], $truecolor);
-			return $gd;
+            return $this->PlotPixelsGD($ThisFileInfo['bmp'], $truecolor);
 		}
 		return false;
 	}
@@ -107,8 +102,8 @@ class phpthumb_bmp {
 		$thisfile_bmp_header_raw['identifier']  = substr($BMPheader, $offset, 2);
 		$offset += 2;
 
-		if ($thisfile_bmp_header_raw['identifier'] != 'BM') {
-			$ThisFileInfo['error'][] = 'Expecting "BM" at offset '.intval(@$ThisFileInfo['avdataoffset']).', found "'.$thisfile_bmp_header_raw['identifier'].'"';
+		if ($thisfile_bmp_header_raw['identifier'] !== 'BM') {
+			$ThisFileInfo['error'][] = 'Expecting "BM" at offset '. (int)@$ThisFileInfo['avdataoffset'] .', found "'.$thisfile_bmp_header_raw['identifier'].'"';
 			unset($ThisFileInfo['fileformat']);
 			unset($ThisFileInfo['bmp']);
 			return false;
@@ -159,7 +154,7 @@ class phpthumb_bmp {
 		$ThisFileInfo['video']['lossless']           = true;
 		$ThisFileInfo['video']['pixel_aspect_ratio'] = (float) 1;
 
-		if ($thisfile_bmp['type_os'] == 'OS/2') {
+		if ($thisfile_bmp['type_os'] === 'OS/2') {
 
 			// OS/2-format BMP
 			// http://netghost.narod.ru/gff/graphics/summary/os2bmp.htm
@@ -227,14 +222,13 @@ class phpthumb_bmp {
 				$thisfile_bmp_header_raw['color_encoding']   = $this->LittleEndian2Int(substr($BMPheader, $offset, 4));
 				$offset += 4;
 				$thisfile_bmp_header_raw['identifier']       = $this->LittleEndian2Int(substr($BMPheader, $offset, 4));
-				$offset += 4;
 
 				$thisfile_bmp_header['compression']          = $this->BMPcompressionOS2Lookup($thisfile_bmp_header_raw['compression']);
 
 				$ThisFileInfo['video']['codec'] = $thisfile_bmp_header['compression'].' '.$thisfile_bmp_header_raw['bits_per_pixel'].'-bit';
 			}
 
-		} elseif ($thisfile_bmp['type_os'] == 'Windows') {
+		} elseif ($thisfile_bmp['type_os'] === 'Windows') {
 
 			// Windows-format BMP
 
@@ -252,9 +246,9 @@ class phpthumb_bmp {
 			// DWORD  biClrUsed;
 			// DWORD  biClrImportant;
 
-			$thisfile_bmp_header_raw['width']            = $this->LittleEndian2Int(substr($BMPheader, $offset, 4), true);
+			$thisfile_bmp_header_raw['width']            = $this->LittleEndian2Int(substr($BMPheader, $offset, 4));
 			$offset += 4;
-			$thisfile_bmp_header_raw['height']           = $this->LittleEndian2Int(substr($BMPheader, $offset, 4), true);
+			$thisfile_bmp_header_raw['height']           = $this->LittleEndian2Int(substr($BMPheader, $offset, 4));
 			$offset += 4;
 			$thisfile_bmp_header_raw['planes']           = $this->LittleEndian2Int(substr($BMPheader, $offset, 2));
 			$offset += 2;
@@ -264,9 +258,9 @@ class phpthumb_bmp {
 			$offset += 4;
 			$thisfile_bmp_header_raw['bmp_data_size']    = $this->LittleEndian2Int(substr($BMPheader, $offset, 4));
 			$offset += 4;
-			$thisfile_bmp_header_raw['resolution_h']     = $this->LittleEndian2Int(substr($BMPheader, $offset, 4), true);
+			$thisfile_bmp_header_raw['resolution_h']     = $this->LittleEndian2Int(substr($BMPheader, $offset, 4));
 			$offset += 4;
-			$thisfile_bmp_header_raw['resolution_v']     = $this->LittleEndian2Int(substr($BMPheader, $offset, 4), true);
+			$thisfile_bmp_header_raw['resolution_v']     = $this->LittleEndian2Int(substr($BMPheader, $offset, 4));
 			$offset += 4;
 			$thisfile_bmp_header_raw['colors_used']      = $this->LittleEndian2Int(substr($BMPheader, $offset, 4));
 			$offset += 4;
@@ -340,7 +334,6 @@ class phpthumb_bmp {
 				$thisfile_bmp_header_raw['profile_data_size']   = $this->LittleEndian2Int(substr($BMPheader, $offset, 4));
 				$offset += 4;
 				$thisfile_bmp_header_raw['reserved3']           = $this->LittleEndian2Int(substr($BMPheader, $offset, 4));
-				$offset += 4;
 			}
 
 		} else {
@@ -353,13 +346,12 @@ class phpthumb_bmp {
 		if ($ExtractPalette || $ExtractData) {
 			$PaletteEntries = 0;
 			if ($thisfile_bmp_header_raw['bits_per_pixel'] < 16) {
-				$PaletteEntries = pow(2, $thisfile_bmp_header_raw['bits_per_pixel']);
+				$PaletteEntries = pow(2,$thisfile_bmp_header_raw['bits_per_pixel']);
 			} elseif (isset($thisfile_bmp_header_raw['colors_used']) && ($thisfile_bmp_header_raw['colors_used'] > 0) && ($thisfile_bmp_header_raw['colors_used'] <= 256)) {
 				$PaletteEntries = $thisfile_bmp_header_raw['colors_used'];
 			}
 			if ($PaletteEntries > 0) {
 				$BMPpalette = substr($BMPdata, $overalloffset, 4 * $PaletteEntries);
-				$overalloffset += 4 * $PaletteEntries;
 
 				$paletteoffset = 0;
 				for ($i = 0; $i < $PaletteEntries; $i++) {
@@ -371,21 +363,17 @@ class phpthumb_bmp {
 					$blue  = $this->LittleEndian2Int(substr($BMPpalette, $paletteoffset++, 1));
 					$green = $this->LittleEndian2Int(substr($BMPpalette, $paletteoffset++, 1));
 					$red   = $this->LittleEndian2Int(substr($BMPpalette, $paletteoffset++, 1));
-					if (($thisfile_bmp['type_os'] == 'OS/2') && ($thisfile_bmp['type_version'] == 1)) {
-						// no padding byte
-					} else {
-						$paletteoffset++; // padding byte
-					}
-					$thisfile_bmp['palette'][$i] = (($red << 16) | ($green << 8) | ($blue));
+					if ($thisfile_bmp['type_os'] !== 'OS/2' || $thisfile_bmp['type_version'] != 1) {
+                        $paletteoffset++; // padding byte
+                    }
+                    $thisfile_bmp['palette'][$i] = (($red << 16) | ($green << 8) | ($blue));
 				}
 			}
 		}
 
 		if ($ExtractData) {
 			$RowByteLength = ceil(($thisfile_bmp_header_raw['width'] * ($thisfile_bmp_header_raw['bits_per_pixel'] / 8)) / 4) * 4; // round up to nearest DWORD boundry
-
 			$BMPpixelData = substr($BMPdata, $thisfile_bmp_header_raw['data_offset'], $thisfile_bmp_header_raw['height'] * $RowByteLength);
-			$overalloffset = $thisfile_bmp_header_raw['data_offset'] + ($thisfile_bmp_header_raw['height'] * $RowByteLength);
 
 			$pixeldataoffset = 0;
 			switch (@$thisfile_bmp_header_raw['compression']) {
@@ -592,7 +580,7 @@ class phpthumb_bmp {
 											// high- and low-order 4 bits, one color index for each pixel. In absolute mode,
 											// each run must be aligned on a word boundary.
 											unset($paletteindexes);
-											for ($i = 0; $i < ceil($secondbyte / 2); $i++) {
+											for ($i = 0, $iMax = ceil($secondbyte / 2); $i < $iMax; $i++) {
 												$paletteindexbyte = $this->LittleEndian2Int(substr($BMPpixelData, $pixeldataoffset++, 1));
 												$paletteindexes[] = ($paletteindexbyte & 0xF0) >> 4;
 												$paletteindexes[] = ($paletteindexbyte & 0x0F);
@@ -665,9 +653,9 @@ class phpthumb_bmp {
 									$pixelvalue = $this->LittleEndian2Int(substr($BMPpixelData, $pixeldataoffset, $thisfile_bmp_header_raw['bits_per_pixel'] / 8));
 									$pixeldataoffset += $thisfile_bmp_header_raw['bits_per_pixel'] / 8;
 
-									$red   = intval(round(((($pixelvalue & $thisfile_bmp_header_raw['red_mask'])   >> $redshift)   / ($thisfile_bmp_header_raw['red_mask']   >> $redshift))   * 255));
-									$green = intval(round(((($pixelvalue & $thisfile_bmp_header_raw['green_mask']) >> $greenshift) / ($thisfile_bmp_header_raw['green_mask'] >> $greenshift)) * 255));
-									$blue  = intval(round(((($pixelvalue & $thisfile_bmp_header_raw['blue_mask'])  >> $blueshift)  / ($thisfile_bmp_header_raw['blue_mask']  >> $blueshift))  * 255));
+									$red   = (int)round(((($pixelvalue & $thisfile_bmp_header_raw['red_mask']) >> $redshift) / ($thisfile_bmp_header_raw['red_mask'] >> $redshift)) * 255);
+									$green = (int)round(((($pixelvalue & $thisfile_bmp_header_raw['green_mask']) >> $greenshift) / ($thisfile_bmp_header_raw['green_mask'] >> $greenshift)) * 255);
+									$blue  = (int)round(((($pixelvalue & $thisfile_bmp_header_raw['blue_mask']) >> $blueshift) / ($thisfile_bmp_header_raw['blue_mask'] >> $blueshift)) * 255);
 									$thisfile_bmp['data'][$row][$col] = (($red << 16) | ($green << 8) | ($blue));
 								}
 								while (($pixeldataoffset % 4) != 0) {
@@ -757,20 +745,19 @@ class phpthumb_bmp {
 			return false;
 		}
 		if (!phpthumb_functions::FunctionIsDisabled('set_time_limit')) {
-			set_time_limit(intval(round($BMPinfo['resolution_x'] * $BMPinfo['resolution_y'] / 10000)));
+			set_time_limit((int)round($BMPinfo['resolution_x'] * $BMPinfo['resolution_y'] / 10000));
 		}
 		$im = $this->PlotPixelsGD($BMPinfo['bmp']);
 		if (headers_sent()) {
 			echo 'plotted '.($BMPinfo['resolution_x'] * $BMPinfo['resolution_y']).' pixels in '.(time() - $starttime).' seconds<BR>';
 			ImageDestroy($im);
 			exit;
-		} else {
-			header('Content-Type: image/png');
-			ImagePNG($im);
-			ImageDestroy($im);
-			return true;
 		}
-		return false;
+
+        header('Content-Type: image/png');
+        ImagePNG($im);
+        ImageDestroy($im);
+        return true;
 	}
 
 	function BMPcompressionWindowsLookup($compressionid) {
@@ -852,7 +839,7 @@ class phpthumb_bmp {
 			$binstring = substr($binstring, 1);
 		}
 		$decvalue = 0;
-		for ($i = 0; $i < strlen($binstring); $i++) {
+		for ($i = 0, $iMax = strlen($binstring); $i < $iMax; $i++) {
 			$decvalue += ((int) substr($binstring, strlen($binstring) - $i - 1, 1)) * pow(2, $i);
 		}
 		return $this->CastAsInt($decvalue * $signmult);
@@ -863,16 +850,12 @@ class phpthumb_bmp {
 		$floatnum = (float) $floatnum;
 
 		// convert a float to type int, only if possible
-		if ($this->trunc($floatnum) == $floatnum) {
-			// it's not floating point
-			if ($floatnum <= 1073741824) { // 2^30
-				// it's within int range
-				$floatnum = (int) $floatnum;
-			}
-		}
+        // it's not floating point
+        if ($floatnum <= 1073741824 && ($this->trunc($floatnum) == $floatnum)) { // 2^30
+            // it's within int range
+            $floatnum = (int) $floatnum;
+        }
 		return $floatnum;
 	}
 
 }
-
-?>
